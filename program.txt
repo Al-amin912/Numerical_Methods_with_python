@@ -1,0 +1,396 @@
+#plot
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Function definition
+def mathematical_function(x):
+    return x**3 - 6*x**2 + 11*x - 6
+
+# Accept user input for range and step size
+start = float(input("Enter the start value for x: "))
+end = float(input("Enter the end value for x: "))
+step_size = float(input("Enter the step size for x: "))
+
+# Calculate corresponding y values
+x_values = np.arange(start, end + step_size, step_size)
+y_values = mathematical_function(x_values)
+
+# Plot the graph
+plt.plot(x_values, y_values, label='f(x) = x^3 - 6x^2 + 11x - 6', color='blue')
+plt.scatter(x_values, y_values, color='red')  # Scatter plot to highlight data points
+plt.xlabel('x')
+plt.ylabel('f(x)')
+plt.title('Graph of the Mathematical Function')
+plt.legend()
+plt.grid(True)
+plt.show()
+
+
+#bisection:
+
+def f(x):
+    return x**3 - 6*x**2 + 11*x - 6
+
+
+def bisection(f, a, b, tolerance, max_iterations):
+    if f(a) * f(b) > 0:
+        raise ValueError("a and b must have different signs.")   
+       
+    iteration = 0   
+    while iteration < max_iterations:
+        c = (a + b) / 2
+        if abs(f(c)) < tolerance:
+            break
+        elif f(c) * f(a) < 0:
+            b = c
+        else:
+            a = c
+        iteration += 1
+    return c, iteration
+
+a = float(input("Enter the start of the interval (a): "))
+b = float(input("Enter the end of the interval (b): "))
+tolerance = float(input("Enter the tolerance: "))
+max_iterations = int(input("Enter the maximum number of iterations: "))
+
+
+root, iterations = bisection(f, a, b,tolerance,max_iterations)
+print("Approximate root:",root)
+print("Number of iterations:", iterations)
+
+
+
+#newton rapson
+
+
+def f(x):
+    return x**3 - 6*x**2 + 11*x - 6
+
+def df(x):
+    return 3*x**2 -12*x +11
+
+def newton_raphson(f, df, x0, tolerance, max_iteration):
+    iterations = 0
+    x = x0
+    while abs(f(x)) > tolerance and iterations < max_iteration:
+        x = x - f(x) / df(x)
+        iterations += 1
+    return x, iterations
+
+
+x0 = float(input("Enter the start of the interval (a): "))
+tolerance = float(input("Enter the tolerance: "))
+max_iterations = int(input("Enter the maximum number of iterations: "))
+
+root, iterations = newton_raphson(f, df,x0 ,tolerance ,max_iterations )
+print("Root:", root)
+print("Iterations:", iterations)
+
+
+#range kutta
+
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+def f(x, y):
+    return -2*x*y
+
+def rk4_solver(f, x0, y0, tf, h):
+    x_values = np.arange(x0, tf + h, h)
+    y_values = []
+
+    x = x0
+    y = y0
+    for x in x_values:
+        y_values.append(y)
+        k1 = h * f(x, y)
+        k2 = h * f(x + h/2, y + k1/2)
+        k3 = h * f(x + h/2, y + k2/2)
+        k4 = h * f(x + h, y + k3)
+        y = y + (k1 + 2*k2 + 2*k3 + k4) / 6
+
+    return x_values, y_values
+
+
+x0 = float(input("Enter the initial condition (x0): "))
+y0= float(input("Enter the initial condition (y0): "))
+tf = float(input("Enter the value of x: "))
+h = float(input("Enter the step size (h): "))
+
+
+x_values, y_values = rk4_solver(f, x0, y0, tf, h)
+print("value,",y_values)
+
+# Plot the result
+plt.plot(x_values, y_values, label='Runge-Kutta 4th Order')
+plt.xlabel('t')
+plt.ylabel('y(t)')
+plt.legend()
+plt.show()
+
+
+#simson 13
+import numpy as np
+
+def f(x):
+    return np.exp(-x**2)
+
+def simpson13(x0,xn,n):
+    h = (xn - x0) / n
+    
+    # Finding sum 
+    integration = f(x0) + f(xn)
+       
+    for i in range(1,n):
+        k = x0 + i*h
+        
+        if i%2 == 0:
+            integration = integration + 2 * f(k)
+        else:
+            integration = integration + 4 * f(k)
+    
+    # Finding final integration value
+    integration = integration * h/3
+    
+    return integration
+    
+# Input section
+lower_limit = float(input("Enter lower limit of integration: "))
+upper_limit = float(input("Enter upper limit of integration: "))
+sub_interval = int(input("Enter number of sub intervals: "))
+
+# Call trapezoidal() method and get result
+result = simpson13(lower_limit, upper_limit, sub_interval)
+print("Integration result by Simpson's 1/3 method is:",result)
+
+
+
+#Range kutta
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+def lagrange(x, y, t):
+    p = 0
+
+    for i in range(len(x)):
+        xi, yi = x[i], y[i]
+        term = yi
+        for j in range(len(x)):
+            if i == j:
+                continue
+            term *= ((t - x[j]) / (xi - x[j]))
+
+        p += term
+    return p
+
+def display_coefficients(x, y):
+    for i, coefficient in enumerate(y):
+        print(f'Coefficient {i}: {coefficient}')
+
+# Given data points
+x_data = []
+y_data = []
+n=4
+for i in range(1, n+1):
+    x, y = map(float, input("Enter the x and y values separated by commas: ").split(","))
+    x_data.append(x)
+    y_data.append(y)
+t_point=float( input("Enter the the vlue of x "))
+# Interpolate at a specific point
+interpolated_value = lagrange(x_data, y_data, t_point)
+
+# Display coefficients
+display_coefficients(x_data, y_data)
+
+# Plotting the interpolation polynomial along with the data points
+x_plot = np.linspace(min(x_data), max(x_data), 100)
+y_plot = [lagrange(x_data, y_data, x) for x in x_plot]
+
+plt.scatter(x_data, y_data, label='Data Points', color='red')
+plt.plot(x_plot, y_plot, label='Lagrange Interpolation Polynomial')
+plt.scatter(t_point, interpolated_value, label=f'Interpolation at {t_point}', color='green')
+plt.xlabel('x')
+plt.ylabel('Interpolated y')
+plt.legend()
+plt.show()
+
+
+
+# newton forward difference
+import numpy as np
+import matplotlib.pyplot as plt
+
+def newton_forward_difference(x, y, t):
+    n = len(x)
+    h = x[1] - x[0]
+    
+    # Create the forward difference table
+    forward_difference_table = np.zeros((n, n))
+    forward_difference_table[:, 0] = y
+
+    for j in range(1, n):
+        for i in range(n - j):
+            forward_difference_table[i, j] = forward_difference_table[i + 1, j - 1] - forward_difference_table[i, j - 1]
+
+    # Calculate the divided differences
+    divided_differences = [forward_difference_table[0, k] for k in range(n)]
+
+    result = divided_differences[0]
+    u = (t - x[0]) / h
+
+    for i in range(1, n):
+        result += (u_difference_product(u, i) * divided_differences[i]) / factorial(i)
+
+    return result
+
+def u_difference_product(u, k):
+    product = u
+    for i in range(1, k):
+        product *= (u - i)
+    return product
+
+def factorial(n):
+    if n == 0:
+        return 1
+    else:
+        return n * factorial(n - 1)
+
+def display_coefficients(x, y):
+    for i, coefficient in enumerate(y):
+        print(f'Coefficient {i}: {coefficient}')
+
+# Given data points
+x_data = []
+y_data = []
+n = 4
+for i in range(1, n+1):
+    x, y = map(float, input("Enter the x and y values separated by commas: ").split(","))
+    x_data.append(x)
+    y_data.append(y)
+
+t_point = float(input("Enter the value of x for interpolation: "))
+
+# Interpolate at a specific point
+interpolated_value = newton_forward_difference(x_data, y_data, t_point)
+
+# Display coefficients
+display_coefficients(x_data, y_data)
+
+# Plotting the interpolation polynomial along with the data points
+x_plot = np.linspace(min(x_data), max(x_data), 100)
+y_plot = [newton_forward_difference(x_data, y_data, x) for x in x_plot]
+
+plt.scatter(x_data, y_data, label='Data Points', color='red')
+plt.plot(x_plot, y_plot, label="Newton's Forward Difference Interpolation Polynomial")
+plt.scatter(t_point, interpolated_value, label=f'Interpolation at {t_point}', color='green')
+plt.xlabel('x')
+plt.ylabel('Interpolated y')
+plt.legend()
+plt.show()
+
+
+
+#fine diference 
+
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.linalg import solve
+
+def finite_difference_solver(N):
+    # Discretize the domain
+    x_values = np.linspace(0, 1, N+1)
+    h = 1/N
+
+    # Formulate the system of linear equations
+    A = np.zeros((N+1, N+1))
+    b = np.zeros(N+1)
+
+    A[0, 0] = 1
+    A[N, N] = 1
+    b[0] = 1
+    b[N] = 2
+
+    for i in range(1, N):
+        A[i, i-1] = 1 / h**2 - 2 / (2 * h)
+        A[i, i] = -2 / h**2 + 1
+        A[i, i+1] = 1 / h**2 + 2 / (2 * h)
+        b[i] = x_values[i]
+
+    # Solve the system of linear equations
+    y_values = solve(A, b)
+
+    return x_values, y_values
+
+def plot_solution(x_values, y_values):
+    plt.plot(x_values, y_values, label='Numerical Solution', marker='o')
+    plt.xlabel('x')
+    plt.ylabel('y(x)')
+    plt.title('Numerical Solution using Finite Difference Method')
+    plt.legend()
+    plt.show()
+
+# Solve the problem for different numbers of internal nodes (N)
+N_values = [10, 20, 40, 80]
+
+for N in N_values:
+    x_values, y_values = finite_difference_solver(N)
+    plot_solution(x_values, y_values)
+
+
+#newton forward
+xpoints = []
+ypoints = []
+delta = []
+deltasquare = []
+deltacube = []
+
+# Input number of points
+n = int(input("Number of points: "))
+
+# Input data points
+for i in range(1, n+1):
+    x, y = map(float, input("Enter the x and y values separated by commas: ").split(","))
+    xpoints.append(x)
+    ypoints.append(y)
+
+# Calculate first-order differences
+for i in range(len(ypoints)-1):
+    value = ypoints[i+1] - ypoints[i]
+    delta.append(value)
+
+print("Table of first-order differences:", delta)
+
+# Calculate second-order differences
+for i in range(len(delta)-1):
+    value = delta[i+1] - delta[i]
+    deltasquare.append(value)
+
+print("Table of second-order differences:", deltasquare)
+
+# Calculate third-order differences
+for i in range(len(deltasquare)-1):
+    value = deltasquare[i+1] - deltasquare[i]
+    deltacube.append(value)
+
+print("Table of third-order differences:", deltacube)
+
+# Additional input
+x = float(input("Enter the value of x for interpolation: "))
+
+# Calculate p and h
+h = xpoints[1] - xpoints[0]
+p = (x - xpoints[0]) / h
+
+print("p =", p)
+print("h =", h)
+
+# Perform interpolation
+yvalue = ypoints[0] + p * delta[0] + p * (p - 1) * deltasquare[0] / 2 + p * (p - 1) * (p - 2) * deltacube[0] / 6
+
+print("Interpolated y value at x =", x, "is", yvalue)
+
+
+

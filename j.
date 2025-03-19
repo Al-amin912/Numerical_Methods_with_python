@@ -1,0 +1,70 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+def newton_forward_difference(x, y, t):
+    n = len(x)
+    h = x[1] - x[0]
+    
+    # Create the forward difference table
+    forward_difference_table = np.zeros((n, n))
+    forward_difference_table[:, 0] = y
+
+    for j in range(1, n):
+        for i in range(n - j):
+            forward_difference_table[i, j] = forward_difference_table[i + 1, j - 1] - forward_difference_table[i, j - 1]
+
+    # Calculate the divided differences
+    divided_differences = [forward_difference_table[0, k] for k in range(n)]
+
+    result = divided_differences[0]
+    u = (t - x[0]) / h
+
+    for i in range(1, n):
+        result += (u_difference_product(u, i) * divided_differences[i]) / factorial(i)
+
+    return result
+
+def u_difference_product(u, k):
+    product = u
+    for i in range(1, k):
+        product *= (u - i)
+    return product
+
+def factorial(n):
+    if n == 0:
+        return 1
+    else:
+        return n * factorial(n - 1)
+
+def display_coefficients(x, y):
+    for i, coefficient in enumerate(y):
+        print(f'Coefficient {i}: {coefficient}')
+
+# Given data points
+x_data = []
+y_data = []
+n = 4
+for i in range(1, n+1):
+    x, y = map(float, input("Enter the x and y values separated by commas: ").split(","))
+    x_data.append(x)
+    y_data.append(y)
+
+t_point = float(input("Enter the value of x for interpolation: "))
+
+# Interpolate at a specific point
+interpolated_value = newton_forward_difference(x_data, y_data, t_point)
+
+# Display coefficients
+display_coefficients(x_data, y_data)
+
+# Plotting the interpolation polynomial along with the data points
+x_plot = np.linspace(min(x_data), max(x_data), 100)
+y_plot = [newton_forward_difference(x_data, y_data, x) for x in x_plot]
+
+plt.scatter(x_data, y_data, label='Data Points', color='red')
+plt.plot(x_plot, y_plot, label="Newton's Forward Difference Interpolation Polynomial")
+plt.scatter(t_point, interpolated_value, label=f'Interpolation at {t_point}', color='green')
+plt.xlabel('x')
+plt.ylabel('Interpolated y')
+plt.legend()
+plt.show()
